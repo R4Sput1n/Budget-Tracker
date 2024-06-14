@@ -70,6 +70,10 @@ document.addEventListener('DOMContentLoaded', function() {
         div.innerHTML = formHtml + '<button type="button" class="btn btn-danger remove-form-btn">-</button>';
         formsetContainer.appendChild(div);
 
+        // Update TOTAL_FORMS count
+        const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+        totalForms.value = formIdx + 1;
+
         // Add the newly created article to all select fields
         const newOption = new Option(articleList.options[articleList.options.length - 1].text, articleList.options[articleList.options.length - 1].value);
         div.querySelector('select[name$="article"]').add(newOption, undefined);
@@ -78,6 +82,11 @@ document.addEventListener('DOMContentLoaded', function() {
     formsetContainer.addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-form-btn')) {
             e.target.parentElement.remove();
+
+            // Update TOTAL_FORMS count
+            const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+            const currentFormsCount = document.querySelectorAll('#formsetContainer .form-row').length;
+            totalForms.value = currentFormsCount;
         }
     });
 
