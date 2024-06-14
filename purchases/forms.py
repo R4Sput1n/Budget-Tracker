@@ -7,7 +7,7 @@ class PurchaseForm(forms.ModelForm):
         model = Purchase
         fields = ['date']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
 
 class PurchaseItemForm(forms.ModelForm):
