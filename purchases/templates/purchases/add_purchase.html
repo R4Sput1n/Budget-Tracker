@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Add Purchase{% endblock %}
+
+{% block content %}
+<h1>Add Purchase</h1>
+<form method="post" id="purchaseForm">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {{ formset.management_form }}
+    <div id="formsetContainer">
+        {% for form in formset %}
+            <div class="form-row">
+                {{ form.as_p }}
+                <button type="button" class="btn btn-danger remove-form-btn">-</button>
+            </div>
+        {% endfor %}
+    </div>
+    <button type="button" class="btn btn-primary" id="addFormBtn">+</button>
+    <button type="submit" class="btn btn-success">Save Purchase</button>
+</form>
+
+<button type="button" class="btn btn-link" data-toggle="modal" data-target="#newArticleModal">
+    Can't find your article? Create it here
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="newArticleModal" tabindex="-1" role="dialog" aria-labelledby="newArticleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newArticleModalLabel">Create New Article</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="newArticleForm" method="post">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    {{ article_form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Article</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<datalist id="article-list">
+    {% for article in articles %}
+    <option value="{{ article.name }} by {{ article.producer_name }}"></option>
+    {% endfor %}
+</datalist>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addFormBtn = document.getElementById('addFormBtn');
+    const formsetContainer = document.getElementById('formsetContainer');
+    const newArticleForm = document.getElementById('newArticleForm');
+    const newArticleModal = document.getElementById('newArticleModal');
+    const articleList = document.getElementById('article-list');
+
+    addFormBtn.addEventListener('click', function() {
+        const formIdx = document.querySelectorAll('#formsetContainer .form-row').length;
+        const formHtml = '{{ formset.empty_form|escapejs }}'.replace(/__prefix__/g, formIdx);
+        const div = document.createElement('div');
+        div.classList.add('form-row');
+        div.innerHTML = formHtml + '<button type="button" class="btn btn-danger remove-form-btn">-</button>';
+        formsetContainer.appendChild(div);
+
+        // Add the newly created article to all select fields
+        const newOption = new Option(articleList.options[articleList.options.length - 1].text, articleList.options[articleList.options.length - 1].value);
+        div.querySelector('select[name$="article"]').add(newOption, undefined);
+    });
+
+    formsetContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-form-btn')) {
+            e.target.parentElement.remove();
+        }
+    });
+
+    newArticleForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch("{% url 'purchases:create_article' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const newOption = new Option(data.article.name, data.article.id);
+                document.querySelectorAll('select[name$="article"]').forEach(select => {
+                    select.add(newOption, undefined);
+                });
+                $('#newArticleModal').modal('hide');
+                this.reset();
+            } else {
+                alert('Failed to create article');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+</script>
+{% endblock %}

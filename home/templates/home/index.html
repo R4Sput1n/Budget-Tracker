@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Welcome to My Project</h1>
+<p>This is the home page. Content will be added here later.</p>
+<a href="{% url 'purchases:add_purchase' %}" class="btn btn-primary">Add Purchase</a>
+<a href="{% url 'purchases:purchase_list' %}" class="btn btn-secondary">View Purchases</a>
+{% endblock %}
