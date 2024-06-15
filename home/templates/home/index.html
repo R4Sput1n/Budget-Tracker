@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Welcome to My Project</h1>
+<p>This is the home page. Content will be added here later.</p>
+
+<div>
+  <h2>Expenses Overview</h2>
+  <form method="get" action="{% url 'home:index' %}">
+    <div class="form-row mb-3">
+      {{ form.view_type.label_tag }}
+      {{ form.view_type }}
+    </div>
+    <div class="form-row mb-3" id="category-group">
+      {{ form.category.label_tag }}
+      {{ form.category }}
+    </div>
+    <div class="form-row mb-3" id="subcategory-group">
+      {{ form.subcategory.label_tag }}
+      {{ form.subcategory }}
+    </div>
+    <div class="form-row mb-3">
+      {{ form.account.label_tag }}
+      {{ form.account }}
+    </div>
+    <div class="form-row mb-3">
+      {{ form.time_range.label_tag }}
+      {{ form.time_range }}
+    </div>
+    <div class="form-row mb-3">
+      <div class="col" id="start-date-group">
+        {{ form.start_date.label_tag }}
+        {{ form.start_date }}
+      </div>
+      <div class="col" id="end-date-group">
+        {{ form.end_date.label_tag }}
+        {{ form.end_date }}
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  <div id="expenses-chart">
+    {{ chart_html|safe }}
+  </div>
+  <p>Total Expenses: {{ total_price }}zł</p>
+</div>
+<div>
+  <h2>Historical Prices</h2>
+  <form method="get" action="{% url 'home:index' %}">
+    <div class="form-row mb-3">
+      {{ historical_form.view_type.label_tag }}
+      {{ historical_form.view_type }}
+    </div>
+    <div class="form-row mb-3" id="hist-category-group">
+      {{ historical_form.category.label_tag }}
+      {{ historical_form.category }}
+    </div>
+    <div class="form-row mb-3" id="hist-subcategory-group">
+      {{ historical_form.subcategory.label_tag }}
+      {{ historical_form.subcategory }}
+    </div>
+    <div class="form-row mb-3" id="hist-item-group">
+      {{ historical_form.item.label_tag }}
+      {{ historical_form.item }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  <div id="historical-prices-chart">
+    {{ hist_chart_html|safe }}
+  </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function updateExpensesForm() {
+            const viewType = document.getElementById('id_view_type').value;
+            const timeRange = document.getElementById('id_time_range').value;
+            const categoryGroup = document.getElementById('category-group');
+            const subcategoryGroup = document.getElementById('subcategory-group');
+            const startDateGroup = document.getElementById('start-date-group');
+            const endDateGroup = document.getElementById('end-date-group');
+
+            if (viewType === 'Category') {
+                categoryGroup.style.display = 'block';
+                subcategoryGroup.style.display = 'none';
+            } else if (viewType === 'Subcategory') {
+                categoryGroup.style.display = 'none';
+                subcategoryGroup.style.display = 'block';
+            } else {
+                categoryGroup.style.display = 'none';
+                subcategoryGroup.style.display = 'none';
+            }
+
+            if (timeRange === 'Custom') {
+                startDateGroup.style.display = 'block';
+                endDateGroup.style.display = 'block';
+            } else {
+                startDateGroup.style.display = 'none';
+                endDateGroup.style.display = 'none';
+            }
+        }
+
+        document.getElementById('id_view_type').addEventListener('change', updateExpensesForm);
+        document.getElementById('id_time_range').addEventListener('change', updateExpensesForm);
+        updateExpensesForm();
+
+        // Script for the Historical Prices form
+        function updateHistoricalForm() {
+            const histViewType = document.getElementById('id_view_type_historical').value;
+            const histCategoryGroup = document.getElementById('hist-category-group');
+            const histSubcategoryGroup = document.getElementById('hist-subcategory-group');
+            const histItemGroup = document.getElementById('hist-item-group');
+
+            if (histViewType === 'Item') {
+                histItemGroup.style.display = 'block';
+                histCategoryGroup.style.display = 'none';
+                histSubcategoryGroup.style.display = 'none';
+            } else if (histViewType === 'Subcategory') {
+                histSubcategoryGroup.style.display = 'block';
+                histCategoryGroup.style.display = 'none';
+                histItemGroup.style.display = 'none';
+            } else if (histViewType === 'Category') {
+                histCategoryGroup.style.display = 'block';
+                histSubcategoryGroup.style.display = 'none';
+                histItemGroup.style.display = 'none';
+            } else {
+                histCategoryGroup.style.display = 'none';
+                histSubcategoryGroup.style.display = 'none';
+                histItemGroup.style.display = 'none';
+            }
+        }
+
+        document.getElementById('id_view_type_historical').addEventListener('change', updateHistoricalForm);
+        updateHistoricalForm();
+    });
+</script>
+{% endblock %}

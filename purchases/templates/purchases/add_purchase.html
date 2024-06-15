@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Add Purchase{% endblock %}
+
+{% block content %}
+<h1>Add Purchase</h1>
+<form method="post" id="purchaseForm">
+  {% csrf_token %}
+  <div class="form-row mb-3">
+    <div class="col-md-6">
+      {{ form.account.label_tag }}
+      {{ form.account }}
+    </div>
+    <div class="col-md-6">
+      {{ form.date.label_tag }}
+      {{ form.date }}
+    </div>
+  </div>
+  {{ formset.management_form }}
+  <div class="form-row">
+    <div class="col">Article</div>
+    <div class="col">Amount</div>
+    <div class="col">Unit</div>
+    <div class="col">Price</div>
+    <div class="col">Promo price</div>
+    <div class="d-flex justify-content-end"></div>
+  </div>
+  <div id="formsetContainer">
+    {% for form in formset %}
+    <div class="form-row mb-3">
+      <div class="col">{{ form.article }}</div>
+      <div class="col">{{ form.amount }}</div>
+      <div class="col">{{ form.unit }}</div>
+      <div class="col">{{ form.price }}</div>
+      <div class="col">{{ form.promo_price }}</div>
+      <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-danger remove-form-btn">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+            <path
+                d="M18 6L17.1991 18.0129C17.129 19.065 17.0939 19.5911 16.8667 19.99C16.6666 20.3412 16.3648 20.6235 16.0011 20.7998C15.588 21 15.0607 21 14.0062 21H9.99377C8.93927 21 8.41202 21 7.99889 20.7998C7.63517 20.6235 7.33339 20.3412 7.13332 19.99C6.90607 19.5911 6.871 19.065 6.80086 18.0129L6 6M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M14 10V17M10 10V17"
+                stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="d-flex align-items-center mb-3">
+    <button type="button" class="btn btn-success mr-2" id="addFormBtn">+</button>
+    <span>Can't find your article? <a href="#" data-toggle="modal"
+                                      data-target="#newArticleModal">Create it here</a></span>
+  </div>
+  <div class="d-flex justify-content-end">
+    <button type="submit" class="btn btn-primary">Save Purchase</button>
+  </div>
+</form>
+
+<!-- Hidden empty form template -->
+<div id="empty-form" class="d-none">
+  <div class="form-row mb-3">
+    <div class="col">
+      {{ formset.empty_form.article }}
+    </div>
+    <div class="col">
+      {{ formset.empty_form.amount }}
+    </div>
+    <div class="col">
+      {{ formset.empty_form.unit }}
+    </div>
+    <div class="col">
+      {{ formset.empty_form.price }}
+    </div>
+    <div class="col">
+      {{ formset.empty_form.promo_price }}
+    </div>
+    <div class="d-flex justify-content-end">
+      <button type="button" class="btn btn-danger remove-form-btn">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+          <path
+              d="M18 6L17.1991 18.0129C17.129 19.065 17.0939 19.5911 16.8667 19.99C16.6666 20.3412 16.3648 20.6235 16.0011 20.7998C15.588 21 15.0607 21 14.0062 21H9.99377C8.93927 21 8.41202 21 7.99889 20.7998C7.63517 20.6235 7.33339 20.3412 7.13332 19.99C6.90607 19.5911 6.871 19.065 6.80086 18.0129L6 6M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M14 10V17M10 10V17"
+              stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="newArticleModal" tabindex="-1" role="dialog" aria-labelledby="newArticleModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newArticleModalLabel">Create New Article</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="newArticleForm" method="post">
+        <div class="modal-body">
+          {% csrf_token %}
+          {{ article_form.as_p }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Article</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<datalist id="article-list">
+  {% for article in articles %}
+  <option value="{{ article.name }}, {{ article.producer_name }}"></option>
+  {% endfor %}
+</datalist>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addFormBtn = document.getElementById('addFormBtn');
+        const formsetContainer = document.getElementById('formsetContainer');
+        const newArticleForm = document.getElementById('newArticleForm');
+        const newArticleModal = document.getElementById('newArticleModal');
+        const articleList = document.getElementById('article-list');
+
+        addFormBtn.addEventListener('click', function () {
+            const formIdx = document.querySelectorAll('#formsetContainer .form-row').length;
+            const emptyForm = document.getElementById('empty-form').innerHTML.replace(/__prefix__/g, formIdx);
+            const div = document.createElement('div');
+            // div.classList.add('form-row', 'mb-3');
+
+            div.innerHTML = emptyForm;
+            formsetContainer.appendChild(div);
+
+            // Update TOTAL_FORMS count
+            const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+            totalForms.value = formIdx + 1;
+        });
+
+        formsetContainer.addEventListener('click', function (e) {
+            if (e.target.closest('.remove-form-btn')) {
+                e.target.closest('.form-row').remove();
+
+                // Update TOTAL_FORMS count
+                const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+                const currentFormsCount = document.querySelectorAll('#formsetContainer .form-row').length;
+                totalForms.value = currentFormsCount;
+            }
+        });
+
+        newArticleForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch("{% url 'purchases:create_article' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const newOption = new Option(data.article.name, data.article.id);
+                        document.querySelectorAll('select[name$="article"]').forEach(select => {
+                            select.add(newOption, undefined);
+                        });
+                        $('#newArticleModal').modal('hide');
+                        this.reset();
+                    } else {
+                        alert('Failed to create article');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
+{% endblock %}
