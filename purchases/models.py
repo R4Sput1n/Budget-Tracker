@@ -19,10 +19,11 @@ class BankAccount(models.Model):
 
 class Transfer(models.Model):
     source_account = models.ForeignKey(BankAccount, related_name='outgoing_transfers', on_delete=models.CASCADE)
-    destination_account = models.ForeignKey(BankAccount, related_name='incoming_transfers',
-                                            on_delete=models.CASCADE)
+    destination_account = models.ForeignKey(BankAccount, related_name='incoming_transfers', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
+    source_balance_before = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    destination_balance_before = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
         return f"Transfer of {self.amount} from {self.source_account} to {self.destination_account} on {self.date}"

@@ -8,9 +8,9 @@
     <thead>
         <tr>
             <th>Source Account</th>
-            <th>After Transfer</th>
+            <th>Balance Before Transfer</th>
             <th>Destination Account</th>
-            <th>After Transfer</th>
+            <th>Balance Before Transfer</th>
             <th>Amount</th>
             <th>Date</th>
         </tr>
@@ -22,12 +22,12 @@
                 {{ data.transfer.source_account.name }}
                 <span style="color: red;">(-{{ data.transfer.amount|floatformat:2 }})</span>
             </td>
-            <td>{{ data.transfer.source_account.balance }}</td>
+            <td>{{ data.transfer.source_balance_before }}</td>
             <td>
                 {{ data.transfer.destination_account.name }}
                 <span style="color: green;">(+{{ data.transfer.amount|floatformat:2 }})</span>
             </td>
-            <td>{{ data.transfer.destination_account.balance }}</td>
+            <td>{{ data.transfer.destination_balance_before }}</td>
             <td>{{ data.transfer.amount|floatformat:2 }}</td>
             <td>{{ data.transfer.date }}</td>
         </tr>

@@ -64,7 +64,7 @@ def create_article(request):
         form = ArticleForm(request.POST)
         if form.is_valid():
             article = form.save()
-            return JsonResponse({'success': True, 'article': {'id': article.id, 'name': f"{article.name} by {article.producer_name}"}})
+            return JsonResponse({'success': True, 'article': {'id': article.id, 'name': f"{article.name}, {article.producer_name}"}})
         else:
             return JsonResponse({'success': False, 'errors': form.errors})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
@@ -92,6 +92,11 @@ def add_transfer(request):
         if form.is_valid():
             transfer = form.save(commit=False)
             with transaction.atomic():
+                # Calculate balances before the transfer
+                transfer.source_balance_before = transfer.source_account.balance
+                transfer.destination_balance_before = transfer.destination_account.balance
+
+                # Update account balances
                 transfer.source_account.balance -= transfer.amount
                 transfer.destination_account.balance += transfer.amount
                 transfer.source_account.save()

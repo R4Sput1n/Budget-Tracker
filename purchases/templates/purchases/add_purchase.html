@@ -113,7 +113,7 @@
 
 <datalist id="article-list">
   {% for article in articles %}
-  <option value="{{ article.name }} by {{ article.producer_name }}"></option>
+  <option value="{{ article.name }}, {{ article.producer_name }}"></option>
   {% endfor %}
 </datalist>
 
