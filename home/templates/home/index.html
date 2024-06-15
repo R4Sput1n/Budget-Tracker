@@ -47,10 +47,35 @@
   </div>
   <p>Total Expenses: {{ total_price }}zł</p>
 </div>
+<div>
+  <h2>Historical Prices</h2>
+  <form method="get" action="{% url 'home:index' %}">
+    <div class="form-row mb-3">
+      {{ historical_form.view_type.label_tag }}
+      {{ historical_form.view_type }}
+    </div>
+    <div class="form-row mb-3" id="hist-category-group">
+      {{ historical_form.category.label_tag }}
+      {{ historical_form.category }}
+    </div>
+    <div class="form-row mb-3" id="hist-subcategory-group">
+      {{ historical_form.subcategory.label_tag }}
+      {{ historical_form.subcategory }}
+    </div>
+    <div class="form-row mb-3" id="hist-item-group">
+      {{ historical_form.item.label_tag }}
+      {{ historical_form.item }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  <div id="historical-prices-chart">
+    {{ hist_chart_html|safe }}
+  </div>
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        function updateForm() {
+        function updateExpensesForm() {
             const viewType = document.getElementById('id_view_type').value;
             const timeRange = document.getElementById('id_time_range').value;
             const categoryGroup = document.getElementById('category-group');
@@ -78,9 +103,38 @@
             }
         }
 
-        document.getElementById('id_view_type').addEventListener('change', updateForm);
-        document.getElementById('id_time_range').addEventListener('change', updateForm);
-        updateForm();
+        document.getElementById('id_view_type').addEventListener('change', updateExpensesForm);
+        document.getElementById('id_time_range').addEventListener('change', updateExpensesForm);
+        updateExpensesForm();
+
+        // Script for the Historical Prices form
+        function updateHistoricalForm() {
+            const histViewType = document.getElementById('id_view_type_historical').value;
+            const histCategoryGroup = document.getElementById('hist-category-group');
+            const histSubcategoryGroup = document.getElementById('hist-subcategory-group');
+            const histItemGroup = document.getElementById('hist-item-group');
+
+            if (histViewType === 'Item') {
+                histItemGroup.style.display = 'block';
+                histCategoryGroup.style.display = 'none';
+                histSubcategoryGroup.style.display = 'none';
+            } else if (histViewType === 'Subcategory') {
+                histSubcategoryGroup.style.display = 'block';
+                histCategoryGroup.style.display = 'none';
+                histItemGroup.style.display = 'none';
+            } else if (histViewType === 'Category') {
+                histCategoryGroup.style.display = 'block';
+                histSubcategoryGroup.style.display = 'none';
+                histItemGroup.style.display = 'none';
+            } else {
+                histCategoryGroup.style.display = 'none';
+                histSubcategoryGroup.style.display = 'none';
+                histItemGroup.style.display = 'none';
+            }
+        }
+
+        document.getElementById('id_view_type_historical').addEventListener('change', updateHistoricalForm);
+        updateHistoricalForm();
     });
 </script>
 {% endblock %}
