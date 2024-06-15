@@ -1,5 +1,6 @@
 from django.db import models
 from home.models import Article
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class Unit(models.Model):
@@ -9,6 +10,11 @@ class Unit(models.Model):
     def __str__(self):
         return self.name
 
+def get_default_unit():
+    try:
+        return Unit.objects.get(name='inne').id
+    except ObjectDoesNotExist:
+        return None  # Handle the case where the 'inne' unit does not exist
 
 class BankAccount(models.Model):
     name = models.CharField(max_length=20, unique=True)
@@ -41,7 +47,7 @@ class PurchaseItem(models.Model):
     purchase = models.ForeignKey(Purchase, related_name='items', on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     amount = models.FloatField(default=1)
-    unit = models.ForeignKey(Unit, default='inne', on_delete=models.SET_DEFAULT)
+    unit = models.ForeignKey(Unit, default=get_default_unit, on_delete=models.SET_DEFAULT, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     promo_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
@@ -50,3 +56,4 @@ class PurchaseItem(models.Model):
         unit_name = self.unit.name if self.unit else 'Unknown Unit'
         promo_price = self.promo_price if self.promo_price else 'N/A'
         return f"{article_name} ({self.amount} {unit_name}) at {self.price} (Promo: {promo_price}) for {self.purchase.date}"
+
