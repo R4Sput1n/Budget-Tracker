@@ -8,20 +8,24 @@
     <thead>
         <tr>
             <th>Date</th>
-            <th>Articles</th>
+            <th>Account</th>
+            <th>Items</th>
+            <th>Total Price</th>
         </tr>
     </thead>
     <tbody>
-        {% for purchase in purchases %}
+        {% for data in purchase_data %}
         <tr>
-            <td>{{ purchase.date }}</td>
+            <td>{{ data.purchase.date }}</td>
+            <td>{{ data.purchase.account.name }}</td>
             <td>
                 <ul>
-                    {% for item in purchase.items.all %}
-                    <li>{{ item.article.name }}: {{ item.price }} {% if item.promo_price %}(Promo: {{ item.promo_price }}){% endif %}</li>
+                    {% for item in data.purchase.items.all %}
+                    <li>{{ item.article.name }}: {{ item.price }}zł {% if item.promo_price %}(Promo: {{ item.promo_price }}zł){% endif %}</li>
                     {% endfor %}
                 </ul>
             </td>
+            <td>{{ data.total_price }}zł</td>
         </tr>
         {% endfor %}
     </tbody>

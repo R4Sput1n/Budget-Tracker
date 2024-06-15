@@ -1,14 +1,17 @@
 from django import forms
-from .models import Purchase, PurchaseItem, Unit
+from .models import Purchase, PurchaseItem, Unit, Transfer
 from home.models import Article
+
 
 class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase
-        fields = ['date']
+        fields = ['account', 'date']
         widgets = {
+            'account': forms.Select(attrs={'class': 'form-control'}),
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
+
 
 class PurchaseItemForm(forms.ModelForm):
     article = forms.ModelChoiceField(
@@ -27,6 +30,7 @@ class PurchaseItemForm(forms.ModelForm):
             'promo_price': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
+
 class ArticleForm(forms.ModelForm):
     class Meta:
         model = Article
@@ -35,4 +39,13 @@ class ArticleForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'producer_name': forms.TextInput(attrs={'class': 'form-control'}),
             'subcategory': forms.Select(attrs={'class': 'form-control', 'empty_label': 'Select subcategory (optional)'}),
+        }
+
+
+class TransferForm(forms.ModelForm):
+    class Meta:
+        model = Transfer
+        fields = ['source_account', 'destination_account', 'amount', 'date']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
         }
