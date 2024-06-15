@@ -10,11 +10,13 @@ class Unit(models.Model):
     def __str__(self):
         return self.name
 
+
 def get_default_unit():
     try:
         return Unit.objects.get(name='inne').id
     except ObjectDoesNotExist:
         return None  # Handle the case where the 'inne' unit does not exist
+
 
 class BankAccount(models.Model):
     name = models.CharField(max_length=20, unique=True)
@@ -22,6 +24,7 @@ class BankAccount(models.Model):
 
     def __str__(self):
         return f"{self.name}: {self.balance}"
+
 
 class Transfer(models.Model):
     source_account = models.ForeignKey(BankAccount, related_name='outgoing_transfers', on_delete=models.CASCADE)
