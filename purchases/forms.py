@@ -19,16 +19,27 @@ class PurchaseItemForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'}),
         required=True
     )
+    amount = forms.FloatField(
+        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        required=True
+    )
+    unit = forms.ModelChoiceField(
+        queryset=Unit.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True
+    )
+    price = forms.DecimalField(
+        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        required=True
+    )
+    promo_price = forms.DecimalField(
+        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        required=False
+    )
 
     class Meta:
         model = PurchaseItem
         fields = ['article', 'amount', 'unit', 'price', 'promo_price']
-        widgets = {
-            'amount': forms.NumberInput(attrs={'class': 'form-control'}),
-            'unit': forms.Select(attrs={'class': 'form-control'}),
-            'price': forms.NumberInput(attrs={'class': 'form-control'}),
-            'promo_price': forms.NumberInput(attrs={'class': 'form-control'}),
-        }
 
 
 class ArticleForm(forms.ModelForm):
