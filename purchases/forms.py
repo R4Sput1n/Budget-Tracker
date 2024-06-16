@@ -1,5 +1,5 @@
 from django import forms
-from .models import Purchase, PurchaseItem, Unit, Transfer
+from .models import Purchase, PurchaseItem, Unit, Transfer, Income
 from home.models import Article
 
 
@@ -59,4 +59,14 @@ class TransferForm(forms.ModelForm):
         fields = ['source_account', 'destination_account', 'amount', 'date']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+
+class IncomeForm(forms.ModelForm):
+    class Meta:
+        model = Income
+        fields = ['account', 'amount', 'date', 'description']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'description': forms.TextInput(attrs={'class': 'form-control'}),
         }

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Unit, Purchase, BankAccount, PurchaseItem
+from .models import Unit, Purchase, BankAccount, PurchaseItem, Income
 
 
 # Register your models here.
@@ -27,7 +27,11 @@ class PurchaseAdmin(admin.ModelAdmin):
     get_items.short_description = 'Purchased Items'
 
 
-
 @admin.register(BankAccount)
 class BankAccountAdmin(admin.ModelAdmin):
     list_display = ('name', 'balance',)
+
+
+@admin.register(Income)
+class IncomeAdmin(admin.ModelAdmin):
+    list_display = ('date', 'account', 'amount', 'description')

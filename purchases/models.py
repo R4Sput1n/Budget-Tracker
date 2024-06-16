@@ -38,6 +38,16 @@ class Transfer(models.Model):
         return f"Transfer of {self.amount} from {self.source_account} to {self.destination_account} on {self.date}"
 
 
+class Income(models.Model):
+    account = models.ForeignKey(BankAccount, related_name='incomes', on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField()
+    description = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return f"Income of {self.amount} to {self.account} on {self.date} ({self.description})"
+
+
 class Purchase(models.Model):
     date = models.DateField()
     account = models.ForeignKey(BankAccount, on_delete=models.SET_NULL, null=True)

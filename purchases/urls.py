@@ -11,4 +11,5 @@ urlpatterns = [
     path('get_expenses/', home_views.get_expenses, name='get_expenses'),
     path('add_transfer/', views.add_transfer, name='add_transfer'),
     path('transfer_list', views.transfer_list, name='transfer_list'),
+    path('add_income/', views.add_income, name='add_income'),
 ]
