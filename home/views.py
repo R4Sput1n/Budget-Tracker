@@ -4,7 +4,7 @@ from django.db.models.functions import Concat
 from django.shortcuts import render
 from django.db.models import Sum, F, Case, When, DecimalField, Avg, Value as V
 from datetime import datetime, timedelta
-from purchases.models import PurchaseItem
+from purchases.models import PurchaseItem, Income, Purchase, BankAccount
 from home.models import Category, SubCategory, Article
 from .forms import ExpenseFilterForm, HistoricalPriceForm
 from django.http import JsonResponse
@@ -15,6 +15,8 @@ def index(request):
     first_day_of_month = today.replace(day=1)
     last_month = today - timedelta(days=31)
     last_week = today - timedelta(days=7)
+
+    total_balance = calculate_balance(request)
 
     # Initialize the forms
     expense_form = ExpenseFilterForm(request.GET or None, initial={
@@ -125,6 +127,7 @@ def index(request):
         'today': today.strftime('%Y-%m-%d'),
         'first_day_of_month': first_day_of_month.strftime('%Y-%m-%d')
     }
+    context.update(total_balance)
 
     return render(request, 'home/index.html', context)
 
@@ -178,3 +181,31 @@ def get_historical_prices(item=None, subcategory=None, category=None):
                 values = [price['avg_price'] for price in prices]
                 data[article.name] = {'dates': dates, 'values': values}
     return data
+
+
+def calculate_balance(request):
+    today = datetime.today()
+    first_day_of_month = today.replace(day=1)
+
+    start_date = request.GET.get('start_date', first_day_of_month)
+    end_date = request.GET.get('end_date', today)
+
+    # Total income and spending within the selected date range
+    total_income = Income.objects.filter(date__range=[start_date, end_date]).aggregate(total=Sum('amount'))[
+                       'total'] or 0
+    total_spending = \
+    PurchaseItem.objects.filter(purchase__date__range=[start_date, end_date]).aggregate(total=Sum('price'))[
+        'total'] or 0
+
+    # Total balance from all accounts
+    total_balance = BankAccount.objects.aggregate(total=Sum('balance'))['total'] or 0
+
+    context = {
+        'total_balance': total_balance,
+        'total_income': total_income,
+        'total_spending': total_spending,
+        'start_date': start_date,
+        'end_date': end_date,
+    }
+
+    return context

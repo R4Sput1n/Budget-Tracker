@@ -1,5 +1,5 @@
 from django import forms
-from .models import Purchase, PurchaseItem, Unit, Transfer
+from .models import Purchase, PurchaseItem, Unit, Transfer, Income
 from home.models import Article
 
 
@@ -19,16 +19,27 @@ class PurchaseItemForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'}),
         required=True
     )
+    amount = forms.FloatField(
+        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        required=True
+    )
+    unit = forms.ModelChoiceField(
+        queryset=Unit.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True
+    )
+    price = forms.DecimalField(
+        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        required=True
+    )
+    promo_price = forms.DecimalField(
+        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        required=False
+    )
 
     class Meta:
         model = PurchaseItem
         fields = ['article', 'amount', 'unit', 'price', 'promo_price']
-        widgets = {
-            'amount': forms.NumberInput(attrs={'class': 'form-control'}),
-            'unit': forms.Select(attrs={'class': 'form-control'}),
-            'price': forms.NumberInput(attrs={'class': 'form-control'}),
-            'promo_price': forms.NumberInput(attrs={'class': 'form-control'}),
-        }
 
 
 class ArticleForm(forms.ModelForm):
@@ -48,4 +59,14 @@ class TransferForm(forms.ModelForm):
         fields = ['source_account', 'destination_account', 'amount', 'date']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+
+class IncomeForm(forms.ModelForm):
+    class Meta:
+        model = Income
+        fields = ['account', 'amount', 'date', 'description']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'description': forms.TextInput(attrs={'class': 'form-control'}),
         }

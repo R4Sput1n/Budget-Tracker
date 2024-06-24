@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from .forms import PurchaseForm, PurchaseItemForm, ArticleForm, TransferForm
-from .models import Purchase, PurchaseItem, Transfer
+from .forms import PurchaseForm, PurchaseItemForm, ArticleForm, TransferForm, IncomeForm
+from .models import Purchase, PurchaseItem, Transfer, Income
 from home.models import Article
 from django.forms import inlineformset_factory
 from django.db import transaction
@@ -71,7 +71,7 @@ def create_article(request):
 
 
 def purchase_list(request):
-    purchases = Purchase.objects.all().prefetch_related('items__article')
+    purchases = Purchase.objects.all().prefetch_related('items__article').order_by('-date')
 
     purchase_data = []
     for purchase in purchases:
@@ -85,6 +85,7 @@ def purchase_list(request):
         })
 
     return render(request, 'purchases/purchase_list.html', {'purchase_data': purchase_data})
+
 
 def add_transfer(request):
     if request.method == 'POST':
@@ -108,18 +109,54 @@ def add_transfer(request):
     return render(request, 'purchases/add_transfer.html', {'form': form})
 
 
+def add_income(request):
+    if request.method == 'POST':
+        form = IncomeForm(request.POST)
+        if form.is_valid():
+            income = form.save(commit=False)
+            with transaction.atomic():
+                account = income.account
+                account.balance += income.amount
+                account.save()
+                income.save()
+            return redirect('purchases:transfer_list')
+    else:
+        form = IncomeForm()
+    return render(request, 'purchases/add_income.html', {'form': form})
+
+
 def transfer_list(request):
     transfers = Transfer.objects.all()
+    incomes = Income.objects.all()
 
-    # Calculate the balances before and after the transfer
-    transfer_data = []
+    # Merge transfers and incomes into a single list
+    combined_data = []
+
     for transfer in transfers:
         source_balance_before = transfer.source_account.balance + transfer.amount
         destination_balance_before = transfer.destination_account.balance - transfer.amount
-        transfer_data.append({
-            'transfer': transfer,
+        combined_data.append({
+            'type': 'transfer',
+            'source_account': transfer.source_account.name,
+            'destination_account': transfer.destination_account.name,
+            'amount': transfer.amount,
+            'date': transfer.date,
             'source_balance_before': source_balance_before,
             'destination_balance_before': destination_balance_before,
         })
 
-    return render(request, 'purchases/transfer_list.html', {'transfer_data': transfer_data})
+    for income in incomes:
+        combined_data.append({
+            'type': 'income',
+            'source_account': income.description if income.description else 'Income',
+            'destination_account': income.account.name,
+            'amount': income.amount,
+            'date': income.date,
+            'source_balance_before': '',
+            'destination_balance_before': income.account.balance - income.amount,
+        })
+
+    # Sort the combined data by date
+    combined_data.sort(key=lambda x: x['date'], reverse=True)
+
+    return render(request, 'purchases/transfer_list.html', {'combined_data': combined_data})
