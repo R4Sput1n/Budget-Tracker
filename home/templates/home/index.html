@@ -3,8 +3,34 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h1>Welcome to My Project</h1>
-<p>This is the home page. Content will be added here later.</p>
+<h1>Welcome to Budget Tracker</h1>
+  <h4>Below you can find the summary of your expenses</h4>
+f
+<div>
+    <h2>Balance</h2>
+    <form method="get" action="{% url 'home:index' %}">
+        <div class="form-row mb-3">
+            <div class="col">
+                <label for="start_date">Start Date</label>
+                <input type="date" name="start_date" id="start_date" value="{{ start_date }}" class="form-control">
+            </div>
+            <div class="col">
+                <label for="end_date">End Date</label>
+                <input type="date" name="end_date" id="end_date" value="{{ end_date }}" class="form-control">
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary mt-4">Update</button>
+            </div>
+        </div>
+    </form>
+    <div>
+        <h3 style="color: {% if total_income > total_spending %}green{% else %}red{% endif %};">
+            Total Balance: {{ total_balance }} <span>{% if total_income > total_spending %}↑{% else %}↓{% endif %}</span>
+        </h3>
+        <p style="color: green;">Total Income: {{ total_income }}</p>
+        <p style="color: red;">Total Spending: {{ total_spending }}</p>
+    </div>
+</div>
 
 <div>
   <h2>Expenses Overview</h2>

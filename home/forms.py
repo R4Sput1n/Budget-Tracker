@@ -3,6 +3,12 @@ from home.models import Category, SubCategory
 from purchases.models import BankAccount, Article
 
 
+class DateRangeForm(forms.Form):
+    start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}), required=False)
+    end_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}), required=False)
+
+
+
 class ExpenseFilterForm(forms.Form):
     VIEW_TYPE_CHOICES = [
         ('Total', 'Total'),

@@ -71,7 +71,7 @@ def create_article(request):
 
 
 def purchase_list(request):
-    purchases = Purchase.objects.all().prefetch_related('items__article')
+    purchases = Purchase.objects.all().prefetch_related('items__article').order_by('-date')
 
     purchase_data = []
     for purchase in purchases:
